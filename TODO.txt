@@ -1,40 +1,5 @@
-- Improve packaging process naming: java-WebServer-1.0-jar-with-dependencies.jar to webserver-1.0.jar
-- Update README file
-- Upload Code to GIT
-- Tag version 0.1 to create downloadable jar
-- SETUP GIT: https://github.com/dasanjos/java-WebServer
-<div class="standard_form" id="next_step">
-      <h2>Global setup:</h2>
-      <pre> <a href="http://help.github.com/set-up-git-redirect" target="_blank">Set up git</a>
-  git config --global user.name "Daniel"
-  git config --global user.email dasanjos@gmail.com
-      </pre>
-
-      <h2>Next steps:</h2>
-      <pre>  mkdir java-WebServer
-  cd java-WebServer
-  git init
-  touch README
-  git add README
-  git commit -m 'first commit'
-  git remote add origin git@github.com:dasanjos/java-WebServer.git
-  git push -u origin master
-      </pre>
-
-      <h2>Existing Git Repo?</h2>
-      <pre>  cd existing_git_repo
-  git remote add origin git@github.com:dasanjos/java-WebServer.git
-  git push -u origin master
-      </pre>
-
-      <h2>Importing a Subversion Repo?</h2>
-      <pre>  <a href="/dasanjos/java-WebServer/imports/new">Click here</a>
-      </pre>
-
-      <h2>When you're done:</h2>
-      <pre>  <a href="/dasanjos/java-WebServer">Continue</a></pre>
-
-</div>
+- Improve packaging process naming: java-WebServer-0.1-jar-with-dependencies.jar to java-WebServer-0.1.jar
+- Tag version 0.1 to create downloadable source package
 
 RESOURCES
 http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
