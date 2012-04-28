@@ -39,8 +39,8 @@ To download and compile the source code you need to install:
 - Maven v2.0+
 - Git v1.7+
 
-Step 2 - Get source from google code
-------------------------------------
+Step 2 - Get the source code
+----------------------------
 Download the project source code from GitHub repository (https://github.com/dasanjos/java-WebServer) 
 
     $ git clone git://github.com/dasanjos/java-WebServer
