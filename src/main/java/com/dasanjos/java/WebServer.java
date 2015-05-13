@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 /**
  * Class <code>WebServer</code> - Main class that starts the Web Server Thread Pool in port 8080 (default)
  */
-public class WebServer extends Thread {
+public class WebServer {
 
 	private static Logger log = Logger.getLogger(WebServer.class);
 
