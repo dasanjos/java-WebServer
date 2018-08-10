@@ -34,10 +34,11 @@ public class HttpResponse {
 				break;
 			case GET:
 				try {
-					fillHeaders(Status._200);
 					// TODO fix dir bug http://localhost:8080/src/test
 					File file = new File("." + req.uri);
 					if (file.isDirectory()) {
+					    fillHeaders(Status._200);
+					    
 						headers.add(ContentType.HTML.toString());
 						StringBuilder result = new StringBuilder("<html><head><title>Index of ");
 						result.append(req.uri);
@@ -53,6 +54,7 @@ public class HttpResponse {
 						result.append("<hr></pre></body></html>");
 						fillResponse(result.toString());
 					} else if (file.exists()) {
+					    fillHeaders(Status._200);
 						setContentType(req.uri, headers);
 						fillResponse(getBytes(file));
 					} else {
