@@ -11,10 +11,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-
 /**
- * HttpResponse class defines the HTTP Response Status Line (method, URI, version) 
- * and Headers http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
+ * HttpResponse class defines the HTTP Response Status Line (method, URI,
+ * version) and Headers http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
  */
 public class HttpResponse {
 
@@ -29,53 +28,51 @@ public class HttpResponse {
 	public HttpResponse(HttpRequest req) throws IOException {
 
 		switch (req.method) {
-			case HEAD:
-				fillHeaders(Status._200);
-				break;
-			case GET:
-				try {
-					// TODO fix dir bug http://localhost:8080/src/test
-					File file = new File("." + req.uri);
-					if (file.isDirectory()) {
-					    fillHeaders(Status._200);
-					    
-						headers.add(ContentType.HTML.toString());
-						StringBuilder result = new StringBuilder("<html><head><title>Index of ");
-						result.append(req.uri);
-						result.append("</title></head><body><h1>Index of ");
-						result.append(req.uri);
-						result.append("</h1><hr><pre>");
+		case HEAD:
+			fillHeaders(Status._200);
+			break;
+		case GET:
+			try {
+				// TODO fix dir bug http://localhost:8080/src/test
+				File file = new File("." + req.uri);
+				if (file.isDirectory()) {
+					fillHeaders(Status._200);
 
-						// TODO add Parent Directory
-						File[] files = file.listFiles();
-						for (File subfile : files) {
-							result.append(" <a href=\"" + subfile.getPath() + "\">" + subfile.getPath() + "</a>\n");
-						}
-						result.append("<hr></pre></body></html>");
-						fillResponse(result.toString());
-					} else if (file.exists()) {
-					    fillHeaders(Status._200);
-						setContentType(req.uri, headers);
-						fillResponse(getBytes(file));
-					} else {
-						log.info("File not found:" + req.uri);
-						fillHeaders(Status._404);
-						fillResponse(Status._404.toString());
+					headers.add(ContentType.HTML.toString());
+					StringBuilder result = new StringBuilder("<html><head><title>Index of ");
+					result.append(req.uri);
+					result.append("</title></head><body><h1>Index of ");
+					result.append(req.uri);
+					result.append("</h1><hr><pre>");
+
+					// TODO add Parent Directory
+					File[] files = file.listFiles();
+					for (File subfile : files) {
+						result.append(" <a href=\"" + subfile.getPath() + "\">" + subfile.getPath() + "</a>\n");
 					}
-				} catch (Exception e) {
-					log.error("Response Error", e);
-					fillHeaders(Status._400);
-					fillResponse(Status._400.toString());
+					result.append("<hr></pre></body></html>");
+					fillResponse(result.toString());
+				} else if (file.exists()) {
+					fillHeaders(Status._200);
+					setContentType(req.uri, headers);
+					fillResponse(getBytes(file));
+				} else {
+					log.info("File not found:" + req.uri);
+					fillHeaders(Status._404);
+					fillResponse(Status._404.toString());
 				}
+			} catch (Exception e) {
 
-				break;
-			case UNRECOGNIZED:
-				fillHeaders(Status._400);
-				fillResponse(Status._400.toString());
-				break;
-			default:
-				fillHeaders(Status._501);
-				fillResponse(Status._501.toString());
+			}
+
+			break;
+		case UNRECOGNIZED:
+			fillHeaders(Status._400);
+			fillResponse(Status._400.toString());
+			break;
+		default:
+			fillHeaders(Status._501);
+			fillResponse(Status._501.toString());
 		}
 
 	}

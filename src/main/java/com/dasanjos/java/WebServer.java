@@ -8,7 +8,8 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 /**
- * Class <code>WebServer</code> - Main class that starts the Web Server Thread Pool in port 8080 (default)
+ * Class <code>WebServer</code> - Main class that starts the Web Server Thread
+ * Pool in port 8080 (default)
  */
 public class WebServer {
 
@@ -27,10 +28,13 @@ public class WebServer {
 	}
 
 	public void start(int port) throws IOException {
+
 		ServerSocket s = new ServerSocket(port);
-		System.out.println("Web server listening on port " + port + " (press CTRL-C to quit)");
+
 		ExecutorService executor = Executors.newFixedThreadPool(N_THREADS);
+
 		while (true) {
+
 			executor.submit(new RequestHandler(s.accept()));
 		}
 	}
