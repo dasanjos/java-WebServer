@@ -10,8 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * HttpRequest class parses the HTTP Request Line (method, URI, version) 
- * and Headers http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+ * HttpRequest class parses the HTTP Request Line (method, URI, version) and
+ * Headers http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
  */
 public class HttpRequest {
 
@@ -26,26 +26,39 @@ public class HttpRequest {
 	String version;
 
 	public HttpRequest(InputStream is) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		String str = reader.readLine();
-		parseRequestLine(str);
 
-		while (!str.equals("")) {
-			str = reader.readLine();
-			parseRequestHeader(str);
+		try {
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String str = reader.readLine();
+			parseRequestLine(str);
+
+			while (!str.equals("")) {
+				str = reader.readLine();
+				parseRequestHeader(str);
+			}
+
+		}
+
+		catch (Exception e) {
+
 		}
 	}
 
 	private void parseRequestLine(String str) {
-		log.info(str);
-		String[] split = str.split("\\s+");
 		try {
-			method = Method.valueOf(split[0]);
+			log.info(str);
+			String[] split = str.split("\\s+");
+			try {
+				method = Method.valueOf(split[0]);
+			} catch (Exception e) {
+				method = Method.UNRECOGNIZED;
+			}
+			uri = split[1];
+			version = split[2];
 		} catch (Exception e) {
-			method = Method.UNRECOGNIZED;
+			//
 		}
-		uri = split[1];
-		version = split[2];
 	}
 
 	private void parseRequestHeader(String str) {
