@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 
 public class WebServerIntegrationTest {
 
@@ -68,6 +69,8 @@ public class WebServerIntegrationTest {
         request.setProtocolVersion(HttpVersion.HTTP_1_0);
         try (CloseableHttpResponse response = client.execute(request)) {
             assertEquals(200, response.getStatusLine().getStatusCode());
+            Assert.assertTrue("Response should contain Content-Length header", response.containsHeader("Content-Length"));
+            Assert.assertTrue("Response should contain Allow header", response.containsHeader("Allow"));
         }
     }
 

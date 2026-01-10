@@ -63,6 +63,18 @@ public class HttpResponseTest {
 		Assert.assertTrue(res.headers.size() > 0);
 		Assert.assertEquals(HttpResponse.VERSION + " " + Status._200, res.headers.get(0));
 		Assert.assertTrue("Body should contain link to test.txt", body.contains(" <a href=\"/test.txt\">test.txt</a>".replace("/", File.separator)));
+        boolean hasContentLength = false;
+        boolean hasLastModified = false;
+        for (String header : res.headers) {
+            if (header.startsWith("Content-Length")) {
+                hasContentLength = true;
+            }
+            if (header.startsWith("Last-Modified")) {
+                hasLastModified = true;
+            }
+        }
+        Assert.assertTrue("Response should contain Content-Length header", hasContentLength);
+        Assert.assertTrue("Response should contain Last-Modified header", hasLastModified);
 	}
 
 	@Test

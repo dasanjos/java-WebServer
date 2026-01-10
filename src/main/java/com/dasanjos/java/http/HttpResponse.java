@@ -12,8 +12,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -55,6 +58,7 @@ public class HttpResponse {
 						if (indexFile.exists() && !indexFile.isDirectory()) {
 							fillHeaders(Status._200);
 							setContentType(indexFile.getName(), headers);
+							addFileHeaders(indexFile, headers);
 							if (req.method == Method.GET) {
 								fillResponse(getBytes(indexFile));
 							}
@@ -83,9 +87,11 @@ public class HttpResponse {
 						if (req.method == Method.GET) {
 							fillResponse(result.toString());
 						}
+						addHtmlHeaders(result.toString(), headers);
 					} else if (file.exists()) {
 						fillHeaders(Status._200);
 						setContentType(req.uri, headers);
+						addFileHeaders(file, headers);
 						if (req.method == Method.GET) {
 							fillResponse(getBytes(file));
 						}
@@ -133,6 +139,23 @@ public class HttpResponse {
 		headers.add(HttpResponse.VERSION + " " + status.toString());
 		headers.add("Connection: close");
 		headers.add("Server: SimpleWebServer");
+		headers.add("Allow: GET, HEAD");
+	}
+
+	private void addFileHeaders(File file, List<String> headers) {
+		headers.add("Last-Modified: " + formatDate(new Date(file.lastModified())));
+		headers.add("Content-Length: " + file.length());
+	}
+
+	private void addHtmlHeaders(String html, List<String> headers) {
+		headers.add("Last-Modified: " + formatDate(new Date()));
+		headers.add("Content-Length: " + html.length());
+	}
+
+	private String formatDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return sdf.format(date);
 	}
 
 	public void fillResponse(String response) {
