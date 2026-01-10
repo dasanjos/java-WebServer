@@ -35,6 +35,9 @@ public class HttpResponse {
 	}
 
 	public HttpResponse(HttpRequest req, File webRoot) throws IOException {
+		if (req == null) {
+			return;
+		}
 		switch (req.method) {
 			case GET:
 			case HEAD:
@@ -93,8 +96,8 @@ public class HttpResponse {
 					}
 				} catch (Exception e) {
 					LOGGER.error("Response Error", e);
-					fillHeaders(Status._400);
-					fillResponse(Status._400.toString());
+					fillHeaders(Status._500);
+					fillResponse(Status._500.toString());
 				}
 
 				break;
@@ -126,17 +129,17 @@ public class HttpResponse {
 		return array;
 	}
 
-	private void fillHeaders(Status status) {
+	public void fillHeaders(Status status) {
 		headers.add(HttpResponse.VERSION + " " + status.toString());
 		headers.add("Connection: close");
 		headers.add("Server: SimpleWebServer");
 	}
 
-	private void fillResponse(String response) {
+	public void fillResponse(String response) {
 		body = response.getBytes();
 	}
 
-	private void fillResponse(byte[] response) {
+	public void fillResponse(byte[] response) {
 		body = response;
 	}
 

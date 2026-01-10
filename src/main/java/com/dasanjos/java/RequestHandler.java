@@ -1,6 +1,7 @@
 package com.dasanjos.java;
 
 import com.dasanjos.java.http.HttpRequest;
+import com.dasanjos.java.http.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,14 @@ public class RequestHandler implements Runnable {
 			res.write(socket.getOutputStream());
 		} catch (Exception e) {
 			LOGGER.error("Runtime Error", e);
+			try {
+				HttpResponse res = new HttpResponse(null, webRoot);
+				res.fillHeaders(Status._500);
+				res.fillResponse(Status._500.toString());
+				res.write(socket.getOutputStream());
+			} catch (Exception e2) {
+				LOGGER.error("Error sending 500 response", e2);
+			}
 		} finally {
 			if (socket != null && !socket.isClosed()) {
 				try {
