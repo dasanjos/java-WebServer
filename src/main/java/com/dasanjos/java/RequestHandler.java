@@ -1,10 +1,10 @@
 package com.dasanjos.java;
 
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.dasanjos.java.http.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.Socket;
 import com.dasanjos.java.http.HttpResponse;
 
 /**
@@ -12,7 +12,7 @@ import com.dasanjos.java.http.HttpResponse;
  */
 public class RequestHandler implements Runnable {
 
-	private static final Logger LOGGER = Logger.getLogger(RequestHandler.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 
 	private Socket socket;
 
@@ -26,13 +26,13 @@ public class RequestHandler implements Runnable {
 			HttpResponse res = new HttpResponse(req);
 			res.write(socket.getOutputStream());
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Runtime Error", e);
+			LOGGER.error("Runtime Error", e);
 		} finally {
 			if (socket != null && !socket.isClosed()) {
 				try {
 					socket.close();
 				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, "Error closing socket", e);
+					LOGGER.warn("Error closing socket", e);
 				}
 			}
     	}

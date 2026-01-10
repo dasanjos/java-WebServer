@@ -1,13 +1,14 @@
 package com.dasanjos.java.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * HttpRequest class parses the HTTP Request Line (method, URI, version) 
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class HttpRequest {
 
-	private static final Logger LOGGER = Logger.getLogger(HttpRequest.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequest.class);
 
 	List<String> headers = new ArrayList<String>();
 
