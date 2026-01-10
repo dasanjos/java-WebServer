@@ -72,11 +72,28 @@ public class WebServerIntegrationTest {
 
     @Test
     public void testHeadRequest() throws IOException {
+        File testFile = tempFolder.newFile("test.txt");
+        try (FileWriter writer = new FileWriter(testFile)) {
+            writer.write("Hello, world!");
+        }
+
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpHead request = new HttpHead("http://localhost:" + port + "/");
-        request.setProtocolVersion(HttpVersion.HTTP_1_0);
-        try (CloseableHttpResponse response = client.execute(request)) {
-            assertEquals(200, response.getStatusLine().getStatusCode());
+
+        // Perform a GET request to get the expected headers
+        HttpGet getRequest = new HttpGet("http://localhost:" + port + "/test.txt");
+        getRequest.setProtocolVersion(HttpVersion.HTTP_1_0);
+        CloseableHttpResponse getResponse = client.execute(getRequest);
+        assertEquals(200, getResponse.getStatusLine().getStatusCode());
+
+        // Perform a HEAD request
+        HttpHead headRequest = new HttpHead("http://localhost:" + port + "/test.txt");
+        headRequest.setProtocolVersion(HttpVersion.HTTP_1_0);
+        try (CloseableHttpResponse headResponse = client.execute(headRequest)) {
+            assertEquals(200, headResponse.getStatusLine().getStatusCode());
+            // Assert that the HEAD response has no body
+            assertEquals(null, headResponse.getEntity());
+            // Assert that the headers are the same
+            assertEquals(getResponse.getAllHeaders().length, headResponse.getAllHeaders().length);
         }
     }
 

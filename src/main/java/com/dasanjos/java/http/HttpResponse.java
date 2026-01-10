@@ -36,10 +36,8 @@ public class HttpResponse {
 
 	public HttpResponse(HttpRequest req, File webRoot) throws IOException {
 		switch (req.method) {
-			case HEAD:
-				fillHeaders(Status._200);
-				break;
 			case GET:
+			case HEAD:
 				try {
 					String rootPath = webRoot.getCanonicalPath();
 					File file = new File(webRoot, req.uri);
@@ -54,7 +52,9 @@ public class HttpResponse {
 						if (indexFile.exists() && !indexFile.isDirectory()) {
 							fillHeaders(Status._200);
 							setContentType(indexFile.getName(), headers);
-							fillResponse(getBytes(indexFile));
+							if (req.method == Method.GET) {
+								fillResponse(getBytes(indexFile));
+							}
 							return;
 						}
 
@@ -77,11 +77,15 @@ public class HttpResponse {
 							result.append(" <a href=\"" + link + "\">" + fileName + "</a>\n");
 						}
 						result.append("<hr></pre></body></html>");
-						fillResponse(result.toString());
+						if (req.method == Method.GET) {
+							fillResponse(result.toString());
+						}
 					} else if (file.exists()) {
 						fillHeaders(Status._200);
 						setContentType(req.uri, headers);
-						fillResponse(getBytes(file));
+						if (req.method == Method.GET) {
+							fillResponse(getBytes(file));
+						}
 					} else {
 						LOGGER.info("File not found: {}", req.uri);
 						fillHeaders(Status._404);
