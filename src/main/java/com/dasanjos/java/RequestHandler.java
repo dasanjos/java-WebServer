@@ -15,16 +15,18 @@ public class RequestHandler implements Runnable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 
-	private Socket socket;
+	private final Socket socket;
+	private final File webRoot;
 
-	public RequestHandler(Socket socket) {
+	public RequestHandler(Socket socket, File webRoot) {
 		this.socket = socket;
+		this.webRoot = webRoot;
 	}
 
 	public void run() {
 		try {
 			HttpRequest req = new HttpRequest(socket.getInputStream());
-			HttpResponse res = new HttpResponse(req, new File("."));
+			HttpResponse res = new HttpResponse(req, webRoot);
 			res.write(socket.getOutputStream());
 		} catch (Exception e) {
 			LOGGER.error("Runtime Error", e);

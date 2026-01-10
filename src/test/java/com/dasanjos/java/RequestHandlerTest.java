@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.Socket;
 
 import static org.mockito.Mockito.when;
@@ -27,7 +28,7 @@ public class RequestHandlerTest {
         when(mockSocket.getOutputStream()).thenReturn(outputStream);
 
         // Create a RequestHandler and run it
-        RequestHandler requestHandler = new RequestHandler(mockSocket);
+        RequestHandler requestHandler = new RequestHandler(mockSocket, new File("."));
         requestHandler.run();
 
         // Verify that the response contains a valid HTTP status line

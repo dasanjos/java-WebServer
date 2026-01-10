@@ -3,6 +3,7 @@ package com.dasanjos.java;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
@@ -16,10 +17,20 @@ public class WebServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebServer.class);
 
     private static final int DEFAULT_PORT = 8080;
-
     private static final int N_THREADS = 3;
 
+    private final File webRoot;
     private volatile boolean running = true;
+    private ServerSocket serverSocket;
+    private ExecutorService executor;
+
+    public WebServer() {
+        this(new File("."));
+    }
+
+    public WebServer(File webRoot) {
+        this.webRoot = webRoot;
+    }
 
     public static void main(String args[]) {
         try {
@@ -30,22 +41,43 @@ public class WebServer {
         }
     }
 
-	public void start(int port) throws IOException {
-		ServerSocket s = new ServerSocket(port);
-        LOGGER.info("Web server listening on port {} \r\nPress CTRL-C to quit", port);
-		final ExecutorService executor = Executors.newFixedThreadPool(N_THREADS);
-        //Add Graceful Shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                running = false;
-                LOGGER.info("Shutting down server...");
-                executor.shutdown();
+    public void start(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
+        LOGGER.info("Web server listening on port {} \r\nPress CTRL-C to quit", getPort());
+        executor = Executors.newFixedThreadPool(N_THREADS);
+
+        // Add Graceful Shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
+
+        while (running) {
+            try {
+                executor.submit(new RequestHandler(serverSocket.accept(), webRoot));
+            } catch (IOException e) {
+                if (running) {
+                    LOGGER.error("Error accepting connection", e);
+                }
             }
-        });
-		while (running) {
-			executor.submit(new RequestHandler(s.accept()));
-		}
-	}
+        }
+    }
+
+    public void stop() {
+        running = false;
+        LOGGER.info("Shutting down server...");
+        if (executor != null) {
+            executor.shutdown();
+        }
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error closing server socket", e);
+        }
+    }
+
+    public int getPort() {
+        return serverSocket != null ? serverSocket.getLocalPort() : -1;
+    }
 
 	/**
 	 * Parse command line arguments (string[] args) for valid port number
