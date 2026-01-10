@@ -31,16 +31,18 @@ public class HttpResponse {
 	byte[] body;
 
 	public HttpResponse(HttpRequest req) throws IOException {
+		this(req, new File("."));
+	}
 
+	public HttpResponse(HttpRequest req, File webRoot) throws IOException {
 		switch (req.method) {
 			case HEAD:
 				fillHeaders(Status._200);
 				break;
 			case GET:
 				try {
-					File root = new File(".");
-					String rootPath = root.getCanonicalPath();
-					File file = new File(root, req.uri);
+					String rootPath = webRoot.getCanonicalPath();
+					File file = new File(webRoot, req.uri);
 					String filePath = file.getCanonicalPath();
 
 					if (!filePath.startsWith(rootPath)) {
@@ -49,14 +51,15 @@ public class HttpResponse {
 						fillResponse(Status._403.toString());
 					} else if (file.isDirectory()) {
 						File indexFile = new File(file, "index.html");
-						if (indexFile.exists()) {
+						if (indexFile.exists() && !indexFile.isDirectory()) {
 							fillHeaders(Status._200);
 							setContentType(indexFile.getName(), headers);
 							fillResponse(getBytes(indexFile));
-						} else {
-							fillHeaders(Status._200);
-							headers.add(ContentType.HTML.toString());
+							return;
 						}
+
+						fillHeaders(Status._200);
+						headers.add(ContentType.HTML.toString());
 						StringBuilder result = new StringBuilder("<html><head><title>Index of ");
 						result.append(req.uri);
 						result.append("</title></head><body><h1>Index of ");
@@ -70,7 +73,7 @@ public class HttpResponse {
 						File[] files = file.listFiles();
 						for (File subfile : files) {
 							String fileName = subfile.getName();
-							String link = new File(req.uri, fileName).getPath();
+							String link = new File(req.uri, fileName).getPath().replace(File.separator, "/");
 							result.append(" <a href=\"" + link + "\">" + fileName + "</a>\n");
 						}
 						result.append("<hr></pre></body></html>");

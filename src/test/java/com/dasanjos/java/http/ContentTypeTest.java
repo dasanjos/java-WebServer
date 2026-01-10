@@ -7,16 +7,18 @@ public class ContentTypeTest {
 
 	@Test
 	public void getCorrectContentTypeByExtension() {
-		Assert.assertEquals(ContentType.CSS, ContentType.valueOf("CSS"));
-		Assert.assertEquals(ContentType.GIF, ContentType.valueOf("GIF"));
-		Assert.assertEquals(ContentType.HTM, ContentType.valueOf("HTM"));
-		Assert.assertEquals(ContentType.HTML, ContentType.valueOf("HTML"));
-		Assert.assertEquals(ContentType.ICO, ContentType.valueOf("ICO"));
-		Assert.assertEquals(ContentType.JPG, ContentType.valueOf("JPG"));
-		Assert.assertEquals(ContentType.JPEG, ContentType.valueOf("JPEG"));
-		Assert.assertEquals(ContentType.PNG, ContentType.valueOf("PNG"));
-		Assert.assertEquals(ContentType.TXT, ContentType.valueOf("TXT"));
-		Assert.assertEquals(ContentType.XML, ContentType.valueOf("XML"));
+		Assert.assertEquals("Content-Type: text/css", ContentType.CSS.toString());
+		Assert.assertEquals("Content-Type: image/gif", ContentType.GIF.toString());
+		Assert.assertEquals("Content-Type: text/html", ContentType.HTM.toString());
+		Assert.assertEquals("Content-Type: text/html", ContentType.HTML.toString());
+		Assert.assertEquals("Content-Type: image/x-icon", ContentType.ICO.toString());
+		Assert.assertEquals("Content-Type: image/jpeg", ContentType.JPG.toString());
+		Assert.assertEquals("Content-Type: image/jpeg", ContentType.JPEG.toString());
+		Assert.assertEquals("Content-Type: image/png", ContentType.PNG.toString());
+		Assert.assertEquals("Content-Type: text/plain", ContentType.TXT.toString());
+		Assert.assertEquals("Content-Type: text/xml", ContentType.XML.toString());
+		Assert.assertEquals("Content-Type: application/pdf", ContentType.PDF.toString());
+		Assert.assertEquals("Content-Type: application/json", ContentType.JSON.toString());
+		Assert.assertEquals("Content-Type: application/javascript", ContentType.JS.toString());
 	}
-
 }

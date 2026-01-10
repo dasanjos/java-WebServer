@@ -4,6 +4,7 @@ import com.dasanjos.java.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.Socket;
 import com.dasanjos.java.http.HttpResponse;
 
@@ -23,7 +24,7 @@ public class RequestHandler implements Runnable {
 	public void run() {
 		try {
 			HttpRequest req = new HttpRequest(socket.getInputStream());
-			HttpResponse res = new HttpResponse(req);
+			HttpResponse res = new HttpResponse(req, new File("."));
 			res.write(socket.getOutputStream());
 		} catch (Exception e) {
 			LOGGER.error("Runtime Error", e);
