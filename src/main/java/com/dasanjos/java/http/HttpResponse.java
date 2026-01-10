@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class HttpResponse {
 
-	private static Logger log = Logger.getLogger(HttpResponse.class);
+	private static final Logger LOGGER = Logger.getLogger(HttpResponse.class.getName());
 
 	public static final String VERSION = "HTTP/1.0";
 
@@ -58,12 +58,12 @@ public class HttpResponse {
 						setContentType(req.uri, headers);
 						fillResponse(getBytes(file));
 					} else {
-						log.info("File not found:" + req.uri);
+						LOGGER.info("File not found:" + req.uri);
 						fillHeaders(Status._404);
 						fillResponse(Status._404.toString());
 					}
 				} catch (Exception e) {
-					log.error("Response Error", e);
+					LOGGER.log(Level.SEVERE, "Response Error", e);
 					fillHeaders(Status._400);
 					fillResponse(Status._400.toString());
 				}
@@ -125,7 +125,7 @@ public class HttpResponse {
 			String ext = uri.substring(uri.indexOf(".") + 1);
 			list.add(ContentType.valueOf(ext.toUpperCase()).toString());
 		} catch (Exception e) {
-			log.error("ContentType not found: " + e, e);
+			LOGGER.log(Level.SEVERE, "ContentType not found: " + e, e);
 		}
 	}
 }

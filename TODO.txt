@@ -1,5 +1,4 @@
 - Improve packaging process naming: java-WebServer-0.1-jar-with-dependencies.jar to java-WebServer-0.1.jar
-- Tag version 0.1 to create downloadable source package
 
 RESOURCES
 http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
