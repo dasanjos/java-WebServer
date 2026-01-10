@@ -35,7 +35,7 @@ public class WebServerTest {
 	@Test(expected = NumberFormatException.class)
 	public void invalidPortTooHighThrowException() {
 		String[] args = new String[1];
-		args[0] = "65535";
+		args[0] = "65536";
 		Assert.assertEquals(8080, WebServer.getValidPortParam(args));
 	}
 

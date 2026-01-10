@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * HttpRequest class parses the HTTP Request Line (method, URI, version) 
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class HttpRequest {
 
-	private static Logger log = Logger.getLogger(HttpRequest.class);
+	private static final Logger LOGGER = Logger.getLogger(HttpRequest.class.getName());
 
 	List<String> headers = new ArrayList<String>();
 
@@ -37,7 +37,7 @@ public class HttpRequest {
 	}
 
 	private void parseRequestLine(String str) {
-		log.info(str);
+		LOGGER.info(str);
 		String[] split = str.split("\\s+");
 		try {
 			method = Method.valueOf(split[0]);
@@ -49,7 +49,7 @@ public class HttpRequest {
 	}
 
 	private void parseRequestHeader(String str) {
-		log.info(str);
+		LOGGER.info(str);
 		headers.add(str);
 	}
 }
