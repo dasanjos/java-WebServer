@@ -3,6 +3,7 @@ package com.dasanjos.java;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -141,6 +142,16 @@ public class WebServerIntegrationTest {
         request.setProtocolVersion(HttpVersion.HTTP_1_0);
         try (CloseableHttpResponse response = client.execute(request)) {
             assertEquals(200, response.getStatusLine().getStatusCode());
+        }
+    }
+
+    @Test
+    public void testPostRequest() throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost request = new HttpPost("http://localhost:" + port + "/");
+        request.setProtocolVersion(HttpVersion.HTTP_1_0);
+        try (CloseableHttpResponse response = client.execute(request)) {
+            assertEquals(501, response.getStatusLine().getStatusCode());
         }
     }
 }

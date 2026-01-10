@@ -98,6 +98,10 @@ public class HttpResponse {
 				}
 
 				break;
+			case POST:
+				fillHeaders(Status._501);
+				fillResponse(Status._501.toString());
+				break;
 			case UNRECOGNIZED:
 				fillHeaders(Status._400);
 				fillResponse(Status._400.toString());
