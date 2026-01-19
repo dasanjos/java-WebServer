@@ -3,13 +3,20 @@ package com.dasanjos.java.http;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.TimeZone;
 
 
 /**
@@ -18,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class HttpResponse {
 
-	private static final Logger LOGGER = Logger.getLogger(HttpResponse.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpResponse.class);
 
 	public static final String VERSION = "HTTP/1.0";
 
@@ -27,18 +34,38 @@ public class HttpResponse {
 	byte[] body;
 
 	public HttpResponse(HttpRequest req) throws IOException {
+		this(req, new File("."));
+	}
 
+	public HttpResponse(HttpRequest req, File webRoot) throws IOException {
+		if (req == null) {
+			return;
+		}
 		switch (req.method) {
-			case HEAD:
-				fillHeaders(Status._200);
-				break;
 			case GET:
+			case HEAD:
 				try {
-					// TODO fix dir bug http://localhost:8080/src/test
-					File file = new File("." + req.uri);
-					if (file.isDirectory()) {
-					    fillHeaders(Status._200);
-					    
+					String rootPath = webRoot.getCanonicalPath();
+					File file = new File(webRoot, req.uri);
+					String filePath = file.getCanonicalPath();
+
+					if (!filePath.startsWith(rootPath)) {
+						LOGGER.warn("Path traversal attempt: {}", req.uri);
+						fillHeaders(Status._403);
+						fillResponse(Status._403.toString());
+					} else if (file.isDirectory()) {
+						File indexFile = new File(file, "index.html");
+						if (indexFile.exists() && !indexFile.isDirectory()) {
+							fillHeaders(Status._200);
+							setContentType(indexFile.getName(), headers);
+							addFileHeaders(indexFile, headers);
+							if (req.method == Method.GET) {
+								fillResponse(getBytes(indexFile));
+							}
+							return;
+						}
+
+						fillHeaders(Status._200);
 						headers.add(ContentType.HTML.toString());
 						StringBuilder result = new StringBuilder("<html><head><title>Index of ");
 						result.append(req.uri);
@@ -46,28 +73,43 @@ public class HttpResponse {
 						result.append(req.uri);
 						result.append("</h1><hr><pre>");
 
-						// TODO add Parent Directory
+						if (!req.uri.equals("/")) {
+							result.append("<a href=\"..\">..</a>\n");
+						}
+
 						File[] files = file.listFiles();
 						for (File subfile : files) {
-							result.append(" <a href=\"" + subfile.getPath() + "\">" + subfile.getPath() + "</a>\n");
+							String fileName = subfile.getName();
+							String link = new File(req.uri, fileName).getPath().replace(File.separator, "/");
+							result.append(" <a href=\"" + link + "\">" + fileName + "</a>\n");
 						}
 						result.append("<hr></pre></body></html>");
-						fillResponse(result.toString());
+						if (req.method == Method.GET) {
+							fillResponse(result.toString());
+						}
+						addHtmlHeaders(result.toString(), headers);
 					} else if (file.exists()) {
-					    fillHeaders(Status._200);
+						fillHeaders(Status._200);
 						setContentType(req.uri, headers);
-						fillResponse(getBytes(file));
+						addFileHeaders(file, headers);
+						if (req.method == Method.GET) {
+							fillResponse(getBytes(file));
+						}
 					} else {
-						LOGGER.info("File not found:" + req.uri);
+						LOGGER.info("File not found: {}", req.uri);
 						fillHeaders(Status._404);
 						fillResponse(Status._404.toString());
 					}
 				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, "Response Error", e);
-					fillHeaders(Status._400);
-					fillResponse(Status._400.toString());
+					LOGGER.error("Response Error", e);
+					fillHeaders(Status._500);
+					fillResponse(Status._500.toString());
 				}
 
+				break;
+			case POST:
+				fillHeaders(Status._501);
+				fillResponse(Status._501.toString());
 				break;
 			case UNRECOGNIZED:
 				fillHeaders(Status._400);
@@ -93,17 +135,34 @@ public class HttpResponse {
 		return array;
 	}
 
-	private void fillHeaders(Status status) {
+	public void fillHeaders(Status status) {
 		headers.add(HttpResponse.VERSION + " " + status.toString());
 		headers.add("Connection: close");
 		headers.add("Server: SimpleWebServer");
+		headers.add("Allow: GET, HEAD");
 	}
 
-	private void fillResponse(String response) {
+	private void addFileHeaders(File file, List<String> headers) {
+		headers.add("Last-Modified: " + formatDate(new Date(file.lastModified())));
+		headers.add("Content-Length: " + file.length());
+	}
+
+	private void addHtmlHeaders(String html, List<String> headers) {
+		headers.add("Last-Modified: " + formatDate(new Date()));
+		headers.add("Content-Length: " + html.length());
+	}
+
+	private String formatDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return sdf.format(date);
+	}
+
+	public void fillResponse(String response) {
 		body = response.getBytes();
 	}
 
-	private void fillResponse(byte[] response) {
+	public void fillResponse(byte[] response) {
 		body = response;
 	}
 
@@ -125,7 +184,7 @@ public class HttpResponse {
 			String ext = uri.substring(uri.indexOf(".") + 1);
 			list.add(ContentType.valueOf(ext.toUpperCase()).toString());
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ContentType not found: " + e, e);
+			LOGGER.error("ContentType not found", e);
 		}
 	}
 }
